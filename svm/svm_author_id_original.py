@@ -22,24 +22,24 @@ features_train, features_test, labels_train, labels_test = preprocess()
 
 #########################################################
 ### your code goes here ###
+
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 
-model = SVC(kernel='rbf')
-
-t0 = time()
+# Riduci il dataset di training al 1%
 features_train = features_train[:int(len(features_train)/100)]
 labels_train = labels_train[:int(len(labels_train)/100)]
 
+model = SVC(kernel='rbf', C=10000)
 model.fit(features_train, labels_train)
-y_pred = model.predict(features_test)
-print("Training Time:", round(time()-t0, 3), "s")
 
-t0 = time()
-accuracy = accuracy_score(y_pred, labels_test)
-print("Predicting Time:", round(time()-t0, 3), "s")
-print()
-print(f"Accuracy: {accuracy}")
+# Make predictions on the test set
+y_pred = model.predict(features_test)
+
+# Evaluate the model's accuracy
+accuracy = accuracy_score(labels_test, y_pred)
+print("Accuracy:", accuracy)
+
 
 #########################################################
 
