@@ -26,14 +26,16 @@ ages_train, ages_test, net_worths_train, net_worths_test = train_test_split(ages
 ### fill in a regression here!  Name the regression object reg so that
 ### the plotting code below works, and you can see what your regression looks like
 
+from sklearn.linear_model import LinearRegression
 
+reg = LinearRegression()
+reg.fit(ages_train, net_worths_train)
 
+print("reg.coef_ with all data", reg.coef_)
+print("reg.intercept_ with all data", reg.intercept_)
 
-
-
-
-
-
+pred = reg.predict(ages_test)
+print("reg.score with all data", reg.score(ages_test, net_worths_test))
 
 try:
     plt.plot(ages, reg.predict(ages), color="blue")
@@ -42,12 +44,32 @@ except NameError:
 plt.scatter(ages, net_worths)
 plt.show()
 
-
 ### identify and remove the most outlier-y points
 cleaned_data = []
 try:
     predictions = reg.predict(ages_train)
     cleaned_data = outlierCleaner( predictions, ages_train, net_worths_train )
+    
+    
+    if cleaned_data:  # assicurati che non sia vuoto
+        ages_cleaned, net_worths_cleaned, errors = zip(*cleaned_data)
+        
+        # Trasforma in numpy array e ridimensiona
+        ages_cleaned = numpy.reshape(numpy.array(ages_cleaned), (len(ages_cleaned), 1))
+        net_worths_cleaned = numpy.reshape(numpy.array(net_worths_cleaned), (len(net_worths_cleaned), 1))
+
+        # Dividi nuovamente i dati in train e test
+        ages_train_cleaned, ages_test_cleaned, net_worths_train_cleaned, net_worths_test_cleaned = train_test_split(
+            ages_cleaned, net_worths_cleaned, test_size=0.1, random_state=42
+        )
+
+        # Rifai la regressione sul nuovo training set
+        reg2 = LinearRegression()
+        reg2.fit(ages_train_cleaned, net_worths_train_cleaned)
+        print("new slope:", reg2.coef_)
+        print("new intercept without outlieri:i", reg2.intercept_)
+        print("new score sul without outlier:", reg2.score(ages_test_cleaned, net_worths_test_cleaned))
+
 except NameError:
     print("Your regression object doesn't exist, or isn't name reg")
     print("Can't make predictions to use in identifying outliers")
@@ -57,7 +79,8 @@ except NameError:
 
 
 
-
+'''
+TO RESTORE:
 ### only run this code if cleaned_data is returning data
 if len(cleaned_data) > 0:
     ages, net_worths, errors = zip(*cleaned_data)
@@ -80,5 +103,6 @@ if len(cleaned_data) > 0:
 
 else:
     print("outlierCleaner() is returning an empty list, no refitting to be done")
-
-
+    
+    
+'''
